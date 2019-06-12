@@ -23,7 +23,7 @@ public class ToDoAppTest {
 	private String username = "chase%40crossbrowsertesting.com", authkey = "YOURAUTHKEY", score = "fail";
 	private String hubString = "http://" + username + ":" + authkey + "@hub.crossbrowsertesting.com:80/wd/hub";
 	private URL hubUrl = null;
-	
+
 	@Before
 	public void setup() {
 		boolean useSecureTunnel = true;
@@ -36,50 +36,51 @@ public class ToDoAppTest {
         caps.setCapability("platform", "Windows 10");
         caps.setCapability("screenResolution", "1366x768");
         caps.setCapability("record_video", "true");
+		caps.setCapability("record_video", "false");
 
         try {
         	hubUrl = new URL(hubString);
         } catch (MalformedURLException ex) {
         	System.out.println(ex.getStackTrace());
         }
-        
+
         driver = new RemoteWebDriver(hubUrl, caps);
         cbt.setSessionId(driver.getSessionId().toString());
         ngDriver = new NgWebDriver(driver);
 	}
-	
+
 	@Test
 	public void TestTodo() {
 		driver.get("http://crossbrowsertesting.github.io/todo-app.html");
 		driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
 		List<WebElement> todos = driver.findElements(ByAngular.model("todo.done"));
-		
+
 		System.out.println("Clicking Todo's");
 		todos.get(3).click();
 		todos.get(4).click();
-		
+
 		System.out.println("Entering Text");
 		WebElement textbox = driver.findElement(ByAngular.model("todoList.todoText"));
 		textbox.sendKeys("Run your first Selenium test");
-		
+
 		System.out.println("Adding new todo's");
 		driver.findElement(By.id("addbutton")).click();
-		
+
 		System.out.println("Archiving old todo's");
 		driver.findElement(By.linkText("archive")).click();
-		
+
 		System.out.println("Grabbing snapshot of finished result");
 		cbt.takeSnapshot();
 		score = "pass";
 	}
-	
+
 	@After
 	public void AfterEach() {
-		if (score.equals("fail")) 
+		if (score.equals("fail"))
 			cbt.setDescription("Test failed!");
-		
+
 		cbt.setScore(score);
-		if (driver != null) 
+		if (driver != null)
 			driver.quit();
 	}
 }
